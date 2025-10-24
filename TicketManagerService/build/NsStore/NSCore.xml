@@ -1,0 +1,429 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>NSCore</name>
+    </assembly>
+    <members>
+        <member name="T:NSCore.DatabaseContext.DatabaseMigrationService`1">
+            <summary>  
+            Provides functionality to apply and manage database migrations for a specified DbContext.  
+            </summary>  
+            <typeparam name="TContext">The type of the DbContext to manage migrations for.</typeparam>  
+        </member>
+        <member name="M:NSCore.DatabaseContext.DatabaseMigrationService`1.#ctor(`0)">
+            <summary>  
+            Initializes a new instance of the <see cref="T:NSCore.DatabaseContext.DatabaseMigrationService`1"/> class.  
+            </summary>  
+            <param name="context">The DbContext instance to manage migrations for.</param>  
+            <exception cref="T:System.ArgumentNullException">Thrown when the provided context is null.</exception>  
+        </member>
+        <member name="M:NSCore.DatabaseContext.DatabaseMigrationService`1.ApplyMigrationsAsync(System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="T:NSCore.DatabaseContext.IDatabaseConfig">
+            <summary>
+            Represents the configuration for a database connection.
+            </summary>
+        </member>
+        <member name="M:NSCore.DatabaseContext.IDatabaseConfig.GetConnectionString">
+            <summary>
+            Returns a formatted connection string for the configured database.
+            </summary>
+            <returns>Database connection string.</returns>
+        </member>
+        <member name="T:NSCore.DatabaseContext.IDatabaseMigrationService">
+            <summary>  
+            Provides methods to manage database migrations.  
+            </summary>  
+        </member>
+        <member name="M:NSCore.DatabaseContext.IDatabaseMigrationService.ApplyMigrationsAsync(System.Threading.CancellationToken)">
+            <summary>  
+            Applies pending migrations to the database asynchronously.  
+            </summary>  
+            <param name="cancellationToken">A token to monitor for cancellation requests.</param>  
+            <returns>A task that represents the asynchronous operation.</returns>  
+        </member>
+        <member name="T:NSCore.DatabaseContext.INsContextInit">
+            <summary>
+            Provides methods to initialize and manage the database context, including checking its creation status and applying migrations.
+            </summary>
+        </member>
+        <member name="M:NSCore.DatabaseContext.INsContextInit.IsContextCreated">
+            <summary>
+            Checks if the database context has been created.
+            </summary>
+            <returns>True if the context is created; otherwise, false.</returns>
+        </member>
+        <member name="M:NSCore.DatabaseContext.INsContextInit.ApplyMigrationsAsync(System.Threading.CancellationToken)">
+            <summary>
+            Applies pending migrations to the database asynchronously.
+            </summary>
+            <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+            <returns>A task that represents the asynchronous operation.</returns>
+        </member>
+        <member name="T:NSCore.DbContextHelper.DbContextHelper">
+            <summary>
+            Generic DbContext registration helper for NSCore that can be used across multiple projects.
+            Provides centralized pooling, logging, and retry configuration.
+            </summary>
+        </member>
+        <member name="M:NSCore.DbContextHelper.DbContextHelper.AddCustomDbContextFactory``1(Microsoft.Extensions.DependencyInjection.IServiceCollection,NSCore.DatabaseContext.IDatabaseConfig,NSCore.Models.DbSetupOptions)">
+            <summary>
+            Registers a DbContextFactory with the specified configuration using a custom configuration action.
+            This is the primary method - it allows the calling service to configure the specific database provider.
+            Always uses pooled DbContext for better performance.
+            </summary>
+            <typeparam name="TDbContext">The DbContext type to register.</typeparam>
+            <param name="services">The service collection.</param>
+            <param name="databaseConfig">The NSCore database configuration (SQLDb, PSQLDb, MySQLDb).</param>
+            <param name="options">Optional configuration for pooling, logging, and advanced features.</param>
+            <returns>The service collection for chaining.</returns>
+        </member>
+        <member name="M:NSCore.DbContextHelper.DbContextHelper.ConfigureDbProvider(Microsoft.EntityFrameworkCore.DbContextOptionsBuilder,NSCore.DatabaseContext.IDatabaseConfig)">
+            <summary>
+            Configures the database provider based on the NSCore database configuration type.
+            </summary>
+            <param name="dbOptions">The DbContext options builder.</param>
+            <param name="databaseConfig">The database configuration.</param>
+            <exception cref="T:System.ArgumentException">Thrown when the database type is not supported.</exception>
+        </member>
+        <member name="T:NSCore.DatabaseProviders.DbProvider">
+            <summary>
+            Specifies supported database providers.
+            </summary>
+        </member>
+        <member name="F:NSCore.DatabaseProviders.DbProvider.SqlServer">
+            <summary>
+            Microsoft SQL Server provider.
+            </summary>
+        </member>
+        <member name="F:NSCore.DatabaseProviders.DbProvider.PostgreSQL">
+            <summary>
+            PostgreSQL provider.
+            </summary>
+        </member>
+        <member name="F:NSCore.DatabaseProviders.DbProvider.MySQL">
+            <summary>
+            MySQL provider.
+            </summary>
+        </member>
+        <member name="T:NSCore.DatabaseProviders.MySQLDb">
+            <summary>
+            Represents a MySQL database provider with connection details.
+            </summary>
+        </member>
+        <member name="P:NSCore.DatabaseProviders.MySQLDb.ServerName">
+            <summary>
+            Gets or sets the name of the MySQL server.
+            </summary>
+        </member>
+        <member name="P:NSCore.DatabaseProviders.MySQLDb.Port">
+            <summary>
+            Gets or sets the port number for the MySQL server.
+            </summary>
+        </member>
+        <member name="P:NSCore.DatabaseProviders.MySQLDb.DatabaseName">
+            <summary>
+            Gets or sets the name of the MySQL database.
+            </summary>
+        </member>
+        <member name="P:NSCore.DatabaseProviders.MySQLDb.UserName">
+            <summary>
+            Gets or sets the username for the MySQL database.
+            </summary>
+        </member>
+        <member name="P:NSCore.DatabaseProviders.MySQLDb.Password">
+            <summary>
+            Gets or sets the password for the MySQL database.
+            </summary>
+        </member>
+        <member name="M:NSCore.DatabaseProviders.MySQLDb.GetConnectionString">
+            <summary>
+            Constructs and returns the connection string for the MySQL database.
+            </summary>
+            <returns>A formatted connection string.</returns>
+        </member>
+        <member name="T:NSCore.DatabaseProviders.PSQLDb">
+            <summary>
+            Represents a PostgreSQL database provider with connection details.
+            </summary>
+        </member>
+        <member name="P:NSCore.DatabaseProviders.PSQLDb.ServerName">
+            <summary>
+            Gets or sets the server name for the PostgreSQL database.
+            </summary>
+        </member>
+        <member name="P:NSCore.DatabaseProviders.PSQLDb.Port">
+            <summary>
+            Gets or sets the port for the PostgreSQL database.
+            </summary>
+        </member>
+        <member name="P:NSCore.DatabaseProviders.PSQLDb.DatabaseName">
+            <summary>
+            Gets or sets the database name for the PostgreSQL database.
+            </summary>
+        </member>
+        <member name="P:NSCore.DatabaseProviders.PSQLDb.UserName">
+            <summary>
+            Gets or sets the user name for the PostgreSQL database.
+            </summary>
+        </member>
+        <member name="P:NSCore.DatabaseProviders.PSQLDb.Password">
+            <summary>
+            Gets or sets the password for the PostgreSQL database.
+            </summary>
+        </member>
+        <member name="M:NSCore.DatabaseProviders.PSQLDb.GetConnectionString">
+            <summary>
+            Constructs and returns the connection string for the PostgreSQL database.
+            </summary>
+            <returns>A formatted connection string.</returns>
+        </member>
+        <member name="T:NSCore.DatabaseProviders.SQLDb">
+            <summary>
+            Represents a SQLServer database provider with connection details.
+            </summary>
+        </member>
+        <member name="P:NSCore.DatabaseProviders.SQLDb.ServerName">
+            <summary>
+            Gets or sets the name of the SQL Server instance.
+            </summary>
+        </member>
+        <member name="P:NSCore.DatabaseProviders.SQLDb.DatabaseName">
+            <summary>
+            Gets or sets the name of the SQL Server database.
+            </summary>
+        </member>
+        <member name="P:NSCore.DatabaseProviders.SQLDb.UserName">
+            <summary>
+            Gets or sets the username for SQL Server authentication.
+            </summary>
+        </member>
+        <member name="P:NSCore.DatabaseProviders.SQLDb.Password">
+            <summary>
+            Gets or sets the password for SQL Server authentication.
+            </summary>
+        </member>
+        <member name="M:NSCore.DatabaseProviders.SQLDb.GetConnectionString">
+            <summary>
+            Constructs and returns the connection string for the SQL Server database.
+            </summary>
+            <returns>A formatted connection string.</returns>
+        </member>
+        <member name="T:NSCore.DatabaseProviders.SQLiteDb">
+            <summary>
+            Represents a SQLite database provider with connection details.
+            </summary>
+        </member>
+        <member name="P:NSCore.DatabaseProviders.SQLiteDb.DatabaseName">
+            <summary>
+            Gets or sets the name of the SQLite database file.
+            </summary>
+        </member>
+        <member name="M:NSCore.DatabaseProviders.SQLiteDb.GetConnectionString">
+            <summary>
+            Constructs and returns the connection string for the MySQL database.
+            </summary>
+            <returns>A formatted connection string.</returns>
+        </member>
+        <member name="T:NSCore.Models.Enums.Actions">
+            <summary>
+            Represents the available actions for entities.
+            </summary>
+        </member>
+        <member name="F:NSCore.Models.Enums.Actions.Read">
+            <summary>
+            Read an entity.
+            </summary>
+        </member>
+        <member name="F:NSCore.Models.Enums.Actions.Create">
+            <summary>
+            Create a new entity.
+            </summary>
+        </member>
+        <member name="F:NSCore.Models.Enums.Actions.Update">
+            <summary>
+            Update an existing entity.
+            </summary>
+        </member>
+        <member name="F:NSCore.Models.Enums.Actions.Delete">
+            <summary>
+            Delete an entity.
+            </summary>
+        </member>
+        <member name="T:NSCore.Models.Enums.IntegerValidationType">
+            <summary>
+            Specifies the types of integer validation checks.
+            </summary>
+        </member>
+        <member name="F:NSCore.Models.Enums.IntegerValidationType.GreaterThanOrEqualToZero">
+            <summary>
+            Value must be greater than or equal to zero.
+            </summary>
+        </member>
+        <member name="F:NSCore.Models.Enums.IntegerValidationType.GreaterThanZero">
+            <summary>
+            Value must be greater than zero.
+            </summary>
+        </member>
+        <member name="F:NSCore.Models.Enums.IntegerValidationType.LessThanZero">
+            <summary>
+            Value must be less than zero.
+            </summary>
+        </member>
+        <member name="F:NSCore.Models.Enums.IntegerValidationType.LessThanOrEqualToZero">
+            <summary>
+            Value must be less than or equal to zero.
+            </summary>
+        </member>
+        <member name="T:NSCore.Models.LazyLoad`1">
+            <summary>
+            Represents a result set for lazy loading scenarios.
+            Contains the loaded items, a flag indicating if more records are available,
+            and the index for the next batch.
+            </summary>
+            <typeparam name="T">Type of the items being loaded.</typeparam>
+        </member>
+        <member name="P:NSCore.Models.LazyLoad`1.Result">
+            <summary>
+            The list of loaded items.
+            </summary>
+        </member>
+        <member name="P:NSCore.Models.LazyLoad`1.HasMoreRecords">
+            <summary>
+            Indicates whether there are more records to load.
+            </summary>
+        </member>
+        <member name="P:NSCore.Models.LazyLoad`1.NextFrom">
+            <summary>
+            The index to start loading the next batch of records.
+            </summary>
+        </member>
+        <member name="T:NSCore.Models.DbSetupOptions">
+            <summary>
+            Configuration options for DbContext registration.
+            </summary>
+        </member>
+        <member name="P:NSCore.Models.DbSetupOptions.EnablePooling">
+            <summary>
+            Whether to enable DbContext pooling for better performance under load.
+            </summary>
+        </member>
+        <member name="P:NSCore.Models.DbSetupOptions.PoolSize">
+            <summary>
+            Maximum number of DbContext instances in the pool (default: 128), 16-32 for dev, 64-128 for prod, 128-256+ for high-load scenarios.
+            </summary>
+        </member>
+        <member name="P:NSCore.Models.DbSetupOptions.EnableDatabaseLogging">
+            <summary>
+            Whether to enable EF Core database command logging.
+            </summary>
+        </member>
+        <member name="P:NSCore.Models.DbSetupOptions.EnableAdvancedFeatures">
+            <summary>
+            Whether to enable advanced features like detailed errors and service provider caching.
+            </summary>
+        </member>
+        <member name="M:NSCore.SearchOption.QueryableExtensions.ApplySearch``1(System.Linq.IQueryable{``0},System.String,SearchMode,System.Linq.Expressions.Expression{System.Func{``0,System.String}}[])">
+            <summary>
+            Applies a search filter to the query based on the specified search term and properties.
+            </summary>
+            <typeparam name="T">The type of the elements in the query.</typeparam>
+            <param name="query">The query to apply the search filter to.</param>
+            <param name="searchTerm">The term to search for. If null or empty, no filtering is applied.</param>
+            <param name="searchMode">The search mode to use: "startswith", "endswith", or "contains".</param>
+            <param name="properties">The properties of the type <typeparamref name="T"/> to search within.</param>
+            <returns>A query with the search filter applied.</returns>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:NSCore.SearchOption.QueryableExtensions.ApplySort``1(System.Linq.IQueryable{``0},System.String,System.Boolean)" -->
+        <member name="M:NSCore.SearchOption.QueryableExtensions.ApplyPagination``1(System.Linq.IQueryable{``0},System.Int32,System.Int32)">
+            <summary>
+            Applies pagination to the query by skipping a specified number of items and taking a specified number of items.
+            </summary>
+            <typeparam name="T">The type of the elements in the query.</typeparam>
+            <param name="query">The query to apply pagination to.</param>
+            <param name="pageNumber">The page number to retrieve (1-based).</param>
+            <param name="pageSize">The number of items per page.</param>
+            <returns>A query with pagination applied.</returns>
+        </member>
+        <member name="T:NSCore.Validation.InputValidator">
+            <summary>
+            Validation types for integer/ string values.
+            </summary>
+        </member>
+        <member name="M:NSCore.Validation.InputValidator.Validate(System.String)">
+            <summary>
+            Validates that the provided string is not null, empty, or whitespace.
+            </summary>
+            <param name="value">The string value to validate.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown if the string is null, empty, or whitespace.</exception>
+        </member>
+        <member name="M:NSCore.Validation.InputValidator.Validate(System.Collections.Generic.List{System.String})">
+            <summary>
+            Validates that the provided list of strings is not null and does not contain null or whitespace strings.
+            </summary>
+            <param name="list">The list of strings to validate.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown if the list is null or contains null or whitespace strings.</exception>
+        </member>
+        <member name="M:NSCore.Validation.InputValidator.Validate(System.Int32,NSCore.Models.Enums.IntegerValidationType)">
+            <summary>
+            Validates an integer value according to the specified <see cref="T:NSCore.Models.Enums.IntegerValidationType"/>.
+            </summary>
+            <param name="value">The integer value to validate.</param>
+            <param name="validationType">The type of validation to perform on the integer value.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown if the value does not meet the validation criteria.</exception>
+            <exception cref="T:System.ArgumentException">Thrown if the validation type is invalid.</exception>
+        </member>
+        <member name="M:NSCore.Validation.InputValidator.Validate(System.Collections.Generic.List{System.Int32},NSCore.Models.Enums.IntegerValidationType)">
+            <summary>
+            Validates that the provided list of integers is not null and that each integer meets the specified validation criteria.
+            </summary>
+            <param name="list">The list of integers to validate.</param>
+            <param name="validationType">The type of validation to perform on each integer value.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown if the list is null.</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown if any integer in the list does not meet the validation criteria.</exception>
+            <exception cref="T:System.ArgumentException">Thrown if the validation type is invalid.</exception>
+        </member>
+        <member name="M:NSCore.Validation.InputValidator.Validate``1(``0)">
+            <summary>
+            Validates that the provided enum value is a defined value of the specified enum type.
+            </summary>
+            <typeparam name="TEnum">The enum type to validate against.</typeparam>
+            <param name="enumValue">The enum value to validate.</param>
+            <exception cref="T:System.ArgumentException">Thrown if the enum value is not defined in the enum type.</exception>
+        </member>
+        <member name="M:NSCore.Validation.InputValidator.Validate``1(System.String)">
+            <summary>
+            Validates that the provided string represents a defined value of the specified enum type.
+            </summary>
+            <typeparam name="TEnum">The enum type to validate against.</typeparam>
+            <param name="enumValueString">The string representation of the enum value to validate.</param>
+            <exception cref="T:System.ArgumentException">Thrown if the string is not a valid name of any value in the enum type.</exception>
+        </member>
+        <member name="T:SearchMode">
+            <summary>
+            Specifies the search mode to use when performing string comparisons.
+            </summary>
+        </member>
+        <member name="F:SearchMode.StartsWith">
+            <summary>
+            The search checks if the string starts with the specified value.
+            </summary>
+        </member>
+        <member name="F:SearchMode.EndsWith">
+            <summary>
+            The search checks if the string ends with the specified value.
+            </summary>
+        </member>
+        <member name="F:SearchMode.Contains">
+            <summary>
+            The search checks if the string contains the specified value.
+            </summary>
+        </member>
+        <member name="F:SearchMode.ExactMatch">
+            <summary>
+            The search checks if the string exactly matches the specified value.
+            </summary>
+        </member>
+    </members>
+</doc>

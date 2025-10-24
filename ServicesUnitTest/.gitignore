@@ -1,0 +1,7 @@
+bin/
+obj/
+packages/
+.vs
+logs/
+build/NsStore/*.xml
+build/NsStore/*.dll

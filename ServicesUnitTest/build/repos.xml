@@ -1,0 +1,11 @@
+<Repositories>
+    <Repository>
+        <Name>NSCore</Name>
+        <Branch>main</Branch>
+    </Repository>
+    
+    <Repository>
+        <Name>NSCatch</Name>
+        <Branch>main</Branch>
+    </Repository>
+</Repositories>

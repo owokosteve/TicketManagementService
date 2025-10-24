@@ -1,0 +1,559 @@
+/* Begin Padding */
+.p6 {
+  padding: 6px !important;
+}
+
+.p5 {
+  padding: 5px !important;
+}
+
+.p8 {
+  padding: 8px !important;
+}
+
+.p10 {
+  padding: 10px !important;
+}
+
+.p20 {
+  padding: 20px !important;
+}
+
+.p16 {
+  padding: 16px !important;
+}
+
+.pb-5 {
+  padding-bottom: 5px;
+}
+
+.pb-10 {
+  padding-bottom: 10px;
+}
+
+.pb-6 {
+  padding-bottom: 6px;
+}
+
+.pb-4 {
+  padding-bottom: 4px;
+}
+.pb-8 {
+  padding-bottom: 8px !important;
+}
+
+.pr5 {
+  padding-right: 5px;
+}
+.p8 {
+  padding: 8px !important;
+}
+
+.pr0 {
+  padding-right: 0;
+}
+
+.pr4 {
+  padding-right: 4px;
+}
+
+.pr-8 {
+  padding-right: 8px;
+}
+
+.pr-10 {
+  padding-right: 10px !important;
+}
+
+.pr-15 {
+  padding-right: 15px !important;
+}
+
+.pr-4 {
+  padding-right: 4px !important;
+}
+
+.pl0 {
+  padding-left: 0;
+}
+
+.pl-2 {
+  padding-left: 2px;
+}
+
+.pl5 {
+  padding-left: 5px !important;
+}
+
+.pl-8 {
+  padding-left: 8px !important;
+}
+
+.pl-10 {
+  padding-left: 10px !important;
+}
+
+.pl-12 {
+  padding-left: 12px !important;
+}
+
+.pl-16 {
+  padding-left: 16px !important;
+}
+
+.pt-50 {
+  padding-top: 51px !important;
+}
+
+.pt-5 {
+  padding-top: 5px !important;
+}
+
+.pt-6 {
+  padding-top: 6px !important;
+}
+
+.pt-9 {
+  padding: 9px 0;
+}
+
+.pt-0 {
+  padding-top: 0px !important;
+}
+
+.pt-8 {
+  padding-top: 8px;
+}
+.pt-10 {
+  padding-top: 10px !important;
+}
+
+.pt-20 {
+  padding-top: 20px !important;
+}
+
+.pt-12 {
+  padding-top: 12px !important;
+}
+.pt-16 {
+  padding-top: 16px !important;
+}
+
+.pl-14 {
+  padding-left: 14px !important;
+}
+
+.pl-4 {
+  padding-left: 4px !important;
+}
+
+/* End padding */
+
+/* Begin Line Height */
+.lh-18 {
+  line-height: 18px;
+}
+
+.lh-20 {
+  line-height: 20px;
+}
+
+.lh-28 {
+  line-height: 28px;
+}
+
+.lh-24 {
+  line-height: 24px;
+}
+.lh-14 {
+  line-height: 14px;
+}
+/* End Line Height */
+/* Begin Margin */
+
+.m10 {
+  margin: 10px;
+}
+.m15 {
+  margin: 15px;
+}
+.m5 {
+  margin: 5px;
+}
+.m20 {
+  margin: 20px;
+}
+
+.mr10 {
+  margin-right: 10px;
+}
+
+.mr5 {
+  margin-right: 5px;
+}
+
+.mr8 {
+  margin-right: 8px;
+}
+
+.ml-12 {
+  margin-left: 12px !important;
+}
+
+.ml-24 {
+  margin-left: 24px;
+}
+
+.ml5 {
+  margin-left: 5px;
+}
+
+.ml-10 {
+  margin-left: 10px !important;
+}
+
+.ml-0 {
+  margin-left: 0 !important;
+}
+
+.mb-0 {
+  margin-bottom: 0;
+}
+
+.mb-5 {
+  margin-bottom: 5px;
+}
+
+.mb-10 {
+  margin-bottom: 10px;
+}
+
+.mr-4 {
+  margin-right: 4px;
+}
+.mt-5 {
+  margin-top: 5px;
+}
+
+.mt-10 {
+  margin-top: 10px;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+/* End Margin */
+
+/* Begin Flex */
+.flex {
+  display: flex !important;
+}
+.block {
+  display: block;
+}
+
+.flexible {
+  flex: 1;
+}
+
+.flex-imp {
+  display: flex !important;
+}
+
+.none {
+  display: none !important;
+}
+
+.flex-horizontal {
+  display: flex;
+  flex-direction: row;
+}
+
+.flex-vertical {
+  display: flex;
+  flex-direction: column;
+}
+
+.align-flex-start {
+  align-items: flex-start !important;
+}
+
+.align-flex-end {
+  align-items: flex-end !important;
+}
+
+.flex-align-center {
+  align-items: center;
+}
+
+.justify {
+  justify-content: center;
+}
+.flex-center {
+  align-items: center;
+  justify-content: center;
+}
+
+.justify-end {
+  justify-content: end;
+}
+
+.justify-between-space {
+  justify-content: space-between;
+}
+.space-between {
+  justify-content: space-between;
+}
+
+/* End Flex */
+/* Begin Aligment */
+.align-right {
+  float: right;
+  margin-left: auto;
+}
+
+.float-left {
+  float: left;
+}
+
+.float-right {
+  float: right;
+}
+/* End Alignment */
+
+/* Begin Overflow */
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.no-wrap {
+  white-space: nowrap;
+}
+.hide-overflow {
+  overflow: hidden;
+}
+.overflow-auto {
+  overflow: auto;
+}
+.lowercase {
+  text-transform: lowercase;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+.text-align-center {
+  text-align: center;
+}
+
+.invisible {
+  visibility: hidden;
+}
+
+.vertical-scroll-on-overflow {
+  overflow-y: scroll;
+}
+.horizontal-scroll-on-overflow {
+  overflow-x: scroll;
+}
+/* End Overflow */
+
+/*Begin Font */
+.bold {
+  font-weight: bold;
+}
+
+.font-400 {
+  font-weight: 400 !important;
+}
+
+.font-500 {
+  font-weight: 500;
+}
+
+.font-600 {
+  font-weight: 600;
+}
+
+.font-700 {
+  font-weight: 700;
+}
+
+.font-11 {
+  font-size: 11px;
+}
+
+.font-12 {
+  font-size: 12px !important;
+}
+
+.font-13 {
+  font-size: 13px !important;
+}
+
+.font-14 {
+  font-size: 14px !important;
+}
+
+.font-15 {
+  font-size: 15px;
+}
+
+.font-16 {
+  font-size: 16px !important;
+}
+
+.font-17 {
+  font-size: 17px;
+}
+
+.font-18 {
+  font-size: 18px !important;
+}
+
+.font-20 {
+  font-size: 20px !important;
+}
+
+.font-24 {
+  font-size: 24px;
+}
+
+.font-35 {
+  font-size: 35px;
+}
+/* End Font */
+
+/* Begin % width, height */
+
+.wd-30 {
+  width: 30%;
+}
+
+.wd-50 {
+  width: 50%;
+}
+
+.wd-60 {
+  width: 60%;
+}
+
+.wd-80 {
+  width: 80%;
+}
+
+.wd-90 {
+  width: 90%;
+}
+
+.wd-20 {
+  width: 20%;
+}
+
+.wd-40 {
+  width: 40%;
+}
+
+.wd-35 {
+  width: 35%;
+}
+
+.wd-100 {
+  width: 100%;
+}
+.view-port-full-width {
+  width: 100vw;
+}
+.wd-max-content {
+  width: max-content;
+}
+
+.h-100 {
+  height: 100%;
+}
+.view-port-height-full {
+  height: 100vh;
+}
+.height-max-content {
+  height: max-content;
+}
+
+/* End % width, height */
+
+/* Begin Border */
+.br-8 {
+  border-radius: 8px;
+}
+
+.br-12 {
+  border-radius: 12px;
+}
+
+.br-4 {
+  border-radius: 4px;
+}
+
+.br-6 {
+  border-radius: 6px;
+}
+
+.no-border-radius {
+  border-radius: 0 !important;
+}
+/* End Border */
+
+/* Begin Static css */
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.pointer-events-none {
+  pointer-events: none;
+}
+
+.dont-select{
+  user-select:none
+}
+
+.no-padding {
+  padding: 0 !important;
+}
+.no-radius {
+  border-radius: 0 !important;
+}
+
+.no-border,
+.no-border:focus {
+  border-width: 0 !important;
+}
+.no-margin {
+  margin: 0;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+}
+
+/* End Static css */
+
+.box-sizing {
+    box-sizing: border-box;
+}
+
+.g5 {
+    gap: 5px;
+}
+
+.g8 {
+    gap: 8px;
+}
+
+.g16 {
+    gap: 16px;
+}
