@@ -178,6 +178,7 @@ public abstract class BaseDbImplementation : INsContextInit, IManageTickets, IDi
     }
 
 
+    /// <inheritdoc/>
     public virtual async Task<Ticket> CreateTicketAsync(CreateTicketDto createTicketDto)
     {
         if (createTicketDto == null) throw new ArgumentNullException(nameof(createTicketDto));
@@ -190,29 +191,30 @@ public abstract class BaseDbImplementation : INsContextInit, IManageTickets, IDi
             Title = createTicketDto.Title,
             Description = createTicketDto.Description,
             Assignee = createTicketDto.Assignee,
+            TicketPriority = createTicketDto.TicketPriority,
             TicketStatus = createTicketDto.TicketStatus,
             PromiseDate = DateTime.UtcNow
         };
 
-        if (createTicketDto.Attachments != null && createTicketDto.Attachments.Any())
+        if (createTicketDto.TicketAttachments != null && createTicketDto.TicketAttachments.Any())
         {
             var uploadsPath = Path.Combine("uploads");
             if (!Directory.Exists(uploadsPath))
                 Directory.CreateDirectory(uploadsPath);
 
             // Upload attachments
-            foreach (var attachment in createTicketDto.Attachments)
+            foreach (var ticketAttachment in createTicketDto.TicketAttachments)
             {
-                var filePath = Path.Combine(uploadsPath, attachment.FileName.Trim().ToLower());
-                using (var fstream = new FileStream(filePath, FileMode.Create)) await attachment.CopyToAsync(fstream);
-                var newAttachment = new FileAttachment
+                var filePath = Path.Combine(uploadsPath, ticketAttachment.FileName.Trim().ToLower());
+                using (var fstream = new FileStream(filePath, FileMode.Create)) await ticketAttachment.CopyToAsync(fstream);
+                var newTicketAttachment = new TicketAttachment
                 {
-                    AttachmentName = attachment.FileName,
-                    AttachmentType = attachment.ContentType,
-                    AttachmentSize = attachment.Length,
+                    AttachmentName = ticketAttachment.FileName,
+                    AttachmentType = ticketAttachment.ContentType,
+                    AttachmentSize = ticketAttachment.Length,
                     AttachmentUrl = filePath
                 };
-                ticket.Attachments.Add(newAttachment);
+                ticket.TicketAttachments.Add(newTicketAttachment);
             }
         }
 
@@ -235,6 +237,7 @@ public abstract class BaseDbImplementation : INsContextInit, IManageTickets, IDi
         }
     }
 
+    /// <inheritdoc/>
     public virtual async Task<Ticket> DeleteTicketAsync(int ticketId)
     {
         if (ticketId <= 0) throw new ArgumentException($"User ID must be greater than zero. {nameof(ticketId)}");
@@ -244,11 +247,11 @@ public abstract class BaseDbImplementation : INsContextInit, IManageTickets, IDi
             using var context = _contextFactory.CreateDbContext();
             using var transaction = await context.Database.BeginTransactionAsync();
 
-            var ticket = await context.Tickets.Include(a => a.Attachments).FirstOrDefaultAsync(t => t.TicketId == ticketId);
+            var ticket = await context.Tickets.Include(a => a.TicketAttachments).FirstOrDefaultAsync(t => t.TicketId == ticketId);
             if (ticket == null) throw new InvalidOperationException($"Ticket with ID {ticketId} not found");
 
             // Remove from disk
-            foreach (var attachment in ticket.Attachments)
+            foreach (var attachment in ticket.TicketAttachments)
             {
                 if (System.IO.File.Exists(attachment.AttachmentUrl))
                     System.IO.File.Delete(attachment.AttachmentUrl);
@@ -270,15 +273,18 @@ public abstract class BaseDbImplementation : INsContextInit, IManageTickets, IDi
         }
     }
 
-    public virtual async Task<Ticket> GetTicketByIdAsync(int ticketId)
+    /// <inheritdoc/>
+    public virtual async Task<Ticket?> GetTicketByIdAsync(int ticketId, bool includeAttachments = false)
     {
         if (ticketId <= 0) throw new ArgumentException($"Ticket ID must be greater than zero. {nameof(ticketId)}");
 
         try
         {
             using var context = _contextFactory.CreateDbContext();
-            var ticket = await context.Tickets.Include(t => t.Attachments).FirstOrDefaultAsync(t => t.TicketId == ticketId);
-            return ticket!;
+            if (includeAttachments)
+                return await context.Tickets.Include(t => t.TicketAttachments).FirstOrDefaultAsync(t => t.TicketId == ticketId);
+            else
+                return await context.Tickets.FirstOrDefaultAsync(t => t.TicketId == ticketId);
         }
         catch (Exception ex)
         {
@@ -286,13 +292,17 @@ public abstract class BaseDbImplementation : INsContextInit, IManageTickets, IDi
         }
     }
 
-    public virtual async Task<List<Ticket>> GetTicketsAsync()
+    /// <inheritdoc/>
+    public virtual async Task<List<Ticket>> GetTicketsAsync(bool includeAttachments = true)
     {
         using var context = _contextFactory.CreateDbContext();
 
         try
         {
-            return await context.Tickets.Include(a => a.Attachments).ToListAsync();
+            if (includeAttachments)
+                return await context.Tickets.Include(a => a.TicketAttachments).ToListAsync();
+            else
+                return await context.Tickets.ToListAsync();
         }
         catch (Exception ex)
         {
@@ -301,36 +311,40 @@ public abstract class BaseDbImplementation : INsContextInit, IManageTickets, IDi
 
     }
 
+    /// <inheritdoc/>
     public async Task<Ticket> UpdateTicketAsync(int ticketId, UpdateTicketDto updateTicketDto)
     {
         using var context = _contextFactory.CreateDbContext();
         using var transaction = await context.Database.BeginTransactionAsync();
 
         var ticket = await GetTicketByIdAsync(ticketId);
-        if (!string.IsNullOrWhiteSpace(updateTicketDto.Title)) ticket.Title = updateTicketDto.Title;
-        if (!string.IsNullOrWhiteSpace(updateTicketDto.Description)) ticket.Description = updateTicketDto.Description;
+
+        if (!string.IsNullOrWhiteSpace(updateTicketDto.Title)) ticket!.Title = updateTicketDto.Title;
+        if (!string.IsNullOrWhiteSpace(updateTicketDto.Description)) ticket!.Description = updateTicketDto.Description;
+        ticket!.TicketPriority = updateTicketDto.TicketPriority ?? ticket.TicketPriority;
         ticket.TicketStatus = updateTicketDto.TicketStatus ?? ticket.TicketStatus;
         ticket.PromiseDate = DateTime.UtcNow;
 
+
         // Add attachments
-        if (updateTicketDto.Attachments != null && updateTicketDto.Attachments.Any())
+        if (updateTicketDto.TicketAttachments != null && updateTicketDto.TicketAttachments.Any())
         {
             var uploadsPath = Path.Combine("uploads");
             if (!Directory.Exists(uploadsPath)) Directory.CreateDirectory(uploadsPath);
 
-            foreach (var attachment in updateTicketDto.Attachments)
+            foreach (var attachment in updateTicketDto.TicketAttachments)
             {
                 var filePath = Path.Combine(uploadsPath, attachment.FileName);
                 using (var stream = new FileStream(filePath, FileMode.Create)) await attachment.CopyToAsync(stream);
 
-                var newAttachment = new FileAttachment
+                var newAttachment = new TicketAttachment
                 {
                     AttachmentName = attachment.FileName,
                     AttachmentType = attachment.ContentType,
                     AttachmentUrl = filePath,
                     AttachmentSize = attachment.Length,
                 };
-                ticket.Attachments.Add(newAttachment);
+                ticket.TicketAttachments.Add(newAttachment);
             }
         }
 
@@ -360,7 +374,7 @@ public abstract class BaseDbImplementation : INsContextInit, IManageTickets, IDi
         using var transaction = await context.Database.BeginTransactionAsync();
 
         var ticket = await GetTicketByIdAsync(ticketId);
-        ticket.TicketStatus = status;
+        ticket!.TicketStatus = status;
 
         try
         {
@@ -381,7 +395,7 @@ public abstract class BaseDbImplementation : INsContextInit, IManageTickets, IDi
         }
     }
 
-    public virtual async Task<FileAttachment> GetTicketAttachmentAsync(int attachmentId)
+    public virtual async Task<TicketAttachment?> GetTicketAttachmentAsync(int attachmentId)
     {
         if (attachmentId <= 0) throw new ArgumentException($"Attachment ID must be greater than zero. {nameof(attachmentId)}");
 
@@ -389,8 +403,8 @@ public abstract class BaseDbImplementation : INsContextInit, IManageTickets, IDi
 
         try
         {
-            var attachment = await context.Attachments.FirstOrDefaultAsync(a => a.AttachmentId == attachmentId);
-            return attachment!;
+            var attachment = await context.TicketAttachments.FirstOrDefaultAsync(a => a.AttachmentId == attachmentId);
+            return attachment;
         }
         catch (Exception ex)
         {
@@ -404,14 +418,14 @@ public abstract class BaseDbImplementation : INsContextInit, IManageTickets, IDi
         if (attachmentId <= 0) throw new ArgumentException($"Attachment ID must be greater than zero.");
 
         var attachment = await GetTicketAttachmentAsync(attachmentId);
-        if(attachment.TicketId == ticketId)
-        {
-            if (System.IO.File.Exists(attachment.AttachmentUrl))
+        // if (attachment.TicketId == ticketId)
+        // {
+            if (System.IO.File.Exists(attachment!.AttachmentUrl))
             {
                 var fileBytes = await System.IO.File.ReadAllBytesAsync(attachment.AttachmentUrl);
                 // var contentType = "application/octet-stream";
             }
-        }
+        // }
     }
 
     public async Task RemoveTicketAttachmentAsync(int attachmentId)
@@ -425,7 +439,7 @@ public abstract class BaseDbImplementation : INsContextInit, IManageTickets, IDi
 
         try
         {
-            context.Attachments.Remove(attachment);
+            context.TicketAttachments.Remove(attachment!);
             await context.SaveChangesAsync();
             await transaction.CommitAsync();
         }
@@ -469,6 +483,21 @@ public abstract class BaseDbImplementation : INsContextInit, IManageTickets, IDi
             // Dispose managed resources if any
             _disposed = true;
         }
+    }
+
+    public Task<List<Ticket>> GetFilteredTicketsAsync(Func<Ticket, bool> predicate)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<int> GetFilteredNumberOfTicketsAsync(Func<Ticket, bool> predicate)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<List<Ticket>> GetTicketByDateRange(DateOnly startDate, DateOnly endDate)
+    {
+        throw new NotImplementedException();
     }
     #endregion
 }

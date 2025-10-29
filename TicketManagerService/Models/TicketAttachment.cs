@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace TicketManagerService.Models;
 
-public class FileAttachment
+public class TicketAttachment
 {
     [Key]
     public int AttachmentId { get; set; }

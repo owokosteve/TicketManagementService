@@ -17,5 +17,5 @@ public class TicketManagerDbContext : DbContext
     }
 
     public DbSet<Ticket> Tickets { get; set; } = null!;
-    public DbSet<FileAttachment> Attachments { get; set; } = null!;
+    public DbSet<TicketAttachment> TicketAttachments { get; set; } = null!;
 }

@@ -10,8 +10,9 @@ public class CreateTicketDto
     public required string Title { get; set; }
     public required string Description { get; set; }
     public required string Assignee { get; set; }
-    public TicketStatus TicketStatus { get; set; }
+    public required TicketPriority TicketPriority { get; set; }
+    public TicketStatus TicketStatus { get; set; } = TicketStatus.Open;
     public DateTime PromiseDate { get; set; }
     public string? TimeZoneId { get; set; }
-    public List<IFormFile>? Attachments { get; set; }
+    public List<IFormFile>? TicketAttachments { get; set; }
 }

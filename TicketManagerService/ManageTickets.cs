@@ -116,7 +116,7 @@ public class ManageTickets : BackgroundService, IManageTickets
         return ticket;
     }
 
-    public async Task<FileAttachment> GetTicketAttachmentAsync(int attachmentId)
+    public async Task<TicketAttachment?> GetTicketAttachmentAsync(int attachmentId)
     {
         EnsureContext();
         var attachment = await _connection.GetTicketAttachmentAsync(attachmentId);
@@ -135,16 +135,16 @@ public class ManageTickets : BackgroundService, IManageTickets
         return await _connection.GetNumberOfTicketsAsync();
     }
 
-    public async Task<int> GetNumberOfTicketsByStatusAsync(TicketStatus status)
+    public async Task<int> GetFilteredNumberOfTicketsAsync(Func<Ticket, bool> predicate)
     {
         EnsureContext();
-        return await _connection.GetNumberOfTicketsByStatusAsync(status);
+        return await _connection.GetFilteredNumberOfTicketsAsync(predicate);
     }
 
-    public async Task<Ticket> GetTicketByIdAsync(int ticketId)
+    public async Task<Ticket?> GetTicketByIdAsync(int ticketId)
     {
         EnsureContext();
-        return await _cacheManager.GetOrSetAsync<Ticket>(BuildTicketKey(ticketId), () => _connection.GetTicketByIdAsync(ticketId));
+        return await _cacheManager.GetOrSetAsync<Ticket?>(BuildTicketKey(ticketId), () => _connection.GetTicketByIdAsync(ticketId));
     }
 
     public async Task<List<Ticket>> GetTicketsAsync()
@@ -218,4 +218,23 @@ public class ManageTickets : BackgroundService, IManageTickets
         }
     }
 
+    public Task<Ticket?> GetTicketByIdAsync(int ticketId, bool includeAttachments = true)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<List<Ticket>> GetTicketsAsync(bool includeAttachments = true)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<List<Ticket>> GetFilteredTicketsAsync(Func<Ticket, bool> predicate)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<List<Ticket>> GetTicketByDateRange(DateOnly startDate, DateOnly endDate)
+    {
+        throw new NotImplementedException();
+    }
 }
