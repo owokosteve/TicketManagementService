@@ -22,7 +22,42 @@ namespace TicketManagerService.Migrations.Postgres
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("TicketManagerService.Models.FileAttachment", b =>
+            modelBuilder.Entity("TicketManagerService.Models.Ticket", b =>
+                {
+                    b.Property<int>("TicketId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("TicketId"));
+
+                    b.Property<string>("Assignee")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("PromiseDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("TicketPriority")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TicketStatus")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("TicketId");
+
+                    b.ToTable("Tickets");
+                });
+
+            modelBuilder.Entity("TicketManagerService.Models.TicketAttachment", b =>
                 {
                     b.Property<int>("AttachmentId")
                         .ValueGeneratedOnAdd()
@@ -52,45 +87,13 @@ namespace TicketManagerService.Migrations.Postgres
 
                     b.HasIndex("TicketId");
 
-                    b.ToTable("Attachments");
+                    b.ToTable("TicketAttachments");
                 });
 
-            modelBuilder.Entity("TicketManagerService.Models.Ticket", b =>
-                {
-                    b.Property<int>("TicketId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("TicketId"));
-
-                    b.Property<string>("Assignee")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("PromiseDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("TicketStatus")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("TicketId");
-
-                    b.ToTable("Tickets");
-                });
-
-            modelBuilder.Entity("TicketManagerService.Models.FileAttachment", b =>
+            modelBuilder.Entity("TicketManagerService.Models.TicketAttachment", b =>
                 {
                     b.HasOne("TicketManagerService.Models.Ticket", "Ticket")
-                        .WithMany("Attachments")
+                        .WithMany("TicketAttachments")
                         .HasForeignKey("TicketId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -100,7 +103,7 @@ namespace TicketManagerService.Migrations.Postgres
 
             modelBuilder.Entity("TicketManagerService.Models.Ticket", b =>
                 {
-                    b.Navigation("Attachments");
+                    b.Navigation("TicketAttachments");
                 });
 #pragma warning restore 612, 618
         }

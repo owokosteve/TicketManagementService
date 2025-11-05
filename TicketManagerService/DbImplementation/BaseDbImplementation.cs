@@ -1,3 +1,5 @@
+using System.Linq.Expressions;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using NSCore.DatabaseContext;
 using TicketManagerService.Data;
@@ -395,6 +397,63 @@ public abstract class BaseDbImplementation : INsContextInit, IManageTickets, IDi
         }
     }
 
+    public virtual async Task UploadTicketAttachmentAsync(int ticketId, bool removePrevious, UpdateAttachmentRequestDto updateAttachmentRequestDto)
+    {
+        if (ticketId <= 0) throw new ArgumentException($"Ticket ID must be greater than zero. {nameof(ticketId)}");
+        if (updateAttachmentRequestDto == null) throw new ArgumentNullException(nameof(updateAttachmentRequestDto));
+
+        using var context = _contextFactory.CreateDbContext();
+        using var transaction = await context.Database.BeginTransactionAsync();
+
+        // var ticketAttachment = new TicketAttachment
+        // {
+        //     AttachmentName = updateAttachmentRequestDto.AttachmentName,
+        //     AttachmentType = updateAttachmentRequestDto.AttachmentType,
+        //     AttachmentSize = updateAttachmentRequestDto.AttachmentSize,
+        //     AttachmentUrl = updateAttachmentRequestDto.AttachmentUrl
+        // };
+
+        var ticket = await GetTicketByIdAsync(ticketId);
+
+        if (ticket!.TicketStatus == TicketStatus.Open || ticket.TicketStatus == TicketStatus.InProgress)
+        {
+            if (updateAttachmentRequestDto != null && updateAttachmentRequestDto.NewTicketAttachment.Any())
+            {
+                // Remove the previous attachment if remove previous = True
+                if (removePrevious == true)
+                {
+                    var attachmentsToDelete = ticket.TicketAttachments.ToList();
+
+                    foreach (var attachment in attachmentsToDelete)
+                    {
+                        if (System.IO.File.Exists(attachment.AttachmentUrl))
+                            System.IO.File.Delete(attachment.AttachmentUrl);
+
+                        var fileAttachment = await GetTicketAttachmentAsync(attachment.AttachmentId);
+                        try
+                        {
+                            await RemoveTicketAttachmentAsync(fileAttachment!);
+                        }
+                        catch (DbUpdateException ex)
+                        {
+                            await transaction.RollbackAsync();
+                            throw new InvalidOperationException($"Failed to upload ticket attachment due to database error. {ex}");
+                        }
+                        catch (Exception ex)
+                        {
+                            await transaction.RollbackAsync();
+                            throw new InvalidOperationException($"An unexpected error occured while uploading attachment. {ex}");
+                        }
+                    }
+                }
+            }
+            else
+            {
+                throw new Exception("No ticket attachment provided.");
+            }
+        }
+    }
+
     public virtual async Task<TicketAttachment?> GetTicketAttachmentAsync(int attachmentId)
     {
         if (attachmentId <= 0) throw new ArgumentException($"Attachment ID must be greater than zero. {nameof(attachmentId)}");
@@ -412,30 +471,11 @@ public abstract class BaseDbImplementation : INsContextInit, IManageTickets, IDi
         }
     }
 
-    public async Task DownloadAttachment(int ticketId, int attachmentId)
+    public async Task RemoveTicketAttachmentAsync(TicketAttachment attachment)
     {
-        if (ticketId <= 0) throw new ArgumentException($"Ticket ID must be greater than zero.");
-        if (attachmentId <= 0) throw new ArgumentException($"Attachment ID must be greater than zero.");
-
-        var attachment = await GetTicketAttachmentAsync(attachmentId);
-        // if (attachment.TicketId == ticketId)
-        // {
-            if (System.IO.File.Exists(attachment!.AttachmentUrl))
-            {
-                var fileBytes = await System.IO.File.ReadAllBytesAsync(attachment.AttachmentUrl);
-                // var contentType = "application/octet-stream";
-            }
-        // }
-    }
-
-    public async Task RemoveTicketAttachmentAsync(int attachmentId)
-    {
-        if (attachmentId <= 0) throw new ArgumentException($"Attachment ID must be greater than zero. {nameof(attachmentId)}");
 
         using var context = _contextFactory.CreateDbContext();
         using var transaction = await context.Database.BeginTransactionAsync();
-
-        var attachment = await GetTicketAttachmentAsync(attachmentId);
 
         try
         {
@@ -462,6 +502,24 @@ public abstract class BaseDbImplementation : INsContextInit, IManageTickets, IDi
         return ticketsByStatus;
     }
 
+    public async Task<List<Ticket>> GetFilteredTicketsAsync(Func<Ticket, bool> predicate, bool includeAttachments)
+    {
+        var tickets = await GetTicketsAsync(includeAttachments);
+        return (List<Ticket>)tickets.Where(predicate).ToList();
+    }
+
+    public async Task<int> GetFilteredNumberOfTicketsAsync(Expression<Func<Ticket, bool>> predicate)
+    {
+        var context = _contextFactory.CreateDbContext();
+        return context.Tickets.Where(predicate).Count();
+    }
+
+    public async Task<List<Ticket>> GetTicketByDateRangeAsync(DateTime startDate, DateTime endDate)
+    {
+        var tickets = await GetTicketsAsync();
+        return tickets.Where(t => t.PromiseDate >= startDate && t.PromiseDate <= endDate).ToList();
+    }
+
     #region Dispose Pattern
     /// <summary>
     /// Disposes the resources used by the BaseDbImplementation.
@@ -483,21 +541,6 @@ public abstract class BaseDbImplementation : INsContextInit, IManageTickets, IDi
             // Dispose managed resources if any
             _disposed = true;
         }
-    }
-
-    public Task<List<Ticket>> GetFilteredTicketsAsync(Func<Ticket, bool> predicate)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<int> GetFilteredNumberOfTicketsAsync(Func<Ticket, bool> predicate)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<List<Ticket>> GetTicketByDateRange(DateOnly startDate, DateOnly endDate)
-    {
-        throw new NotImplementedException();
     }
     #endregion
 }

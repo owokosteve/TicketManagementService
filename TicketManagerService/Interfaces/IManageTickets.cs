@@ -1,4 +1,5 @@
 using System;
+using System.Linq.Expressions;
 using TicketManagerService.DTOs;
 using TicketManagerService.Models;
 
@@ -49,7 +50,7 @@ public interface IManageTickets
     /// <returns>
     /// A task represents the asynchronous operation. The task result contains the list filtered tickets according to specified predicate.
     /// </returns>
-    Task<List<Ticket>> GetFilteredTicketsAsync(Func<Ticket, bool> predicate);
+    Task<List<Ticket>> GetFilteredTicketsAsync(Func<Ticket, bool> predicate, bool includeAttachments = true);
 
     /// <summary>
     /// Updates the details of a ticket
@@ -75,19 +76,19 @@ public interface IManageTickets
     Task<TicketAttachment?> GetTicketAttachmentAsync(int attachmentId);
 
     /// <summary>
-    /// Generates a donwload url for a ticket attachment.
+    /// Updates ticket attachment only
     /// </summary>
-    /// <param name="ticketId">The ID of the attachment's ticket.</param>
-    /// <param name="attachementId">The ID of the ticket attachment.</param>
-    /// <returns>A task that represents the asynchronous operation.</returns>
-    Task DownloadAttachment(int ticketId, int attachementId);
+    /// <param name="ticketId">The Ticket ID of the attachment</param>
+    /// <param name="updateAttachmentRequestDto">Ticket attachment request Dto.</param>
+    /// <returns>A task that represent the asynchronous operation.</returns>
+    Task UploadTicketAttachmentAsync(int ticketId, bool removePrevious, UpdateAttachmentRequestDto updateAttachmentRequestDto);
 
     /// <summary>
     /// Deletes a ticket attachment.
     /// </summary>
-    /// <param name="attachmentId">The ID of the ticket attachment.</param>
+    /// <param name="attachment">The Ticket attachment.</param>
     /// <returns>A task that represents the asynchrounous operation.</returns>
-    Task RemoveTicketAttachmentAsync(int attachmentId);
+    Task RemoveTicketAttachmentAsync(TicketAttachment attachment);
 
     /// <summary>
     /// Gets the total number of tickets.
@@ -100,7 +101,7 @@ public interface IManageTickets
     /// </summary>
     /// <param name="predicate">The predicate name to filter.</param>
     /// <returns>A task that represent the asynchronous operation.</returns>
-    Task<int> GetFilteredNumberOfTicketsAsync(Func<Ticket, bool> predicate);
+    Task<int> GetFilteredNumberOfTicketsAsync(Expression<Func<Ticket, bool>> predicate);
 
     /// <summary>
     /// Retrierves a ticket based on date range.
@@ -108,5 +109,5 @@ public interface IManageTickets
     /// <param name="startDate">The start date.</param>
     /// <param name="endDate">The end date.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    Task<List<Ticket>> GetTicketByDateRange(DateOnly startDate, DateOnly endDate);
+    Task<List<Ticket>> GetTicketByDateRangeAsync(DateTime startDate, DateTime endDate);
 }

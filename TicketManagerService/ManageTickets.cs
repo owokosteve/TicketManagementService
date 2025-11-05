@@ -1,4 +1,5 @@
 using System;
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using NSCatch.Interfaces;
@@ -122,32 +123,26 @@ public class ManageTickets : BackgroundService, IManageTickets
         var attachment = await _connection.GetTicketAttachmentAsync(attachmentId);
         return attachment;
     }
-
-    public async Task DownloadAttachment(int ticketId, int attachementId)
-    {
-        EnsureContext();
-        await _connection.DownloadAttachment(ticketId, attachementId);
-    }
-
+ 
     public async Task<int> GetNumberOfTicketsAsync()
     {
         EnsureContext();
         return await _connection.GetNumberOfTicketsAsync();
     }
 
-    public async Task<int> GetFilteredNumberOfTicketsAsync(Func<Ticket, bool> predicate)
+    public async Task<int> GetFilteredNumberOfTicketsAsync(Expression<Func<Ticket, bool>> predicate)
     {
         EnsureContext();
         return await _connection.GetFilteredNumberOfTicketsAsync(predicate);
     }
 
-    public async Task<Ticket?> GetTicketByIdAsync(int ticketId)
+    public async Task<Ticket?> GetTicketByIdAsync(int ticketId, bool includeAttachments = true)
     {
         EnsureContext();
         return await _cacheManager.GetOrSetAsync<Ticket?>(BuildTicketKey(ticketId), () => _connection.GetTicketByIdAsync(ticketId));
     }
 
-    public async Task<List<Ticket>> GetTicketsAsync()
+    public async Task<List<Ticket>> GetTicketsAsync(bool includeAttachments = true)
     {
         EnsureContext();
         return await _cacheManager.GetOrSetAsync<List<Ticket>>(key: BuildTicketsKey(), () => _connection.GetTicketsAsync());
@@ -180,10 +175,28 @@ public class ManageTickets : BackgroundService, IManageTickets
         return await _connection.UpdateTicketStatusAsync(ticketId, status);
     }
 
-    public async Task RemoveTicketAttachmentAsync(int attachmentId)
+    public async  Task UploadTicketAttachmentAsync(int ticketId, bool removePrevious, UpdateAttachmentRequestDto updateAttachmentRequestDto)
     {
         EnsureContext();
-        await _connection.RemoveTicketAttachmentAsync(attachmentId);
+        await _connection.UploadTicketAttachmentAsync(ticketId, removePrevious, updateAttachmentRequestDto);
+    }
+
+    public async Task RemoveTicketAttachmentAsync(TicketAttachment attachment)
+    {
+        EnsureContext();
+        await _connection.RemoveTicketAttachmentAsync(attachment);
+    }
+
+    public async Task<List<Ticket>> GetFilteredTicketsAsync(Func<Ticket, bool> predicate, bool includeAttachments)
+    {
+        EnsureContext();
+        return await _connection.GetFilteredTicketsAsync(predicate);
+    }
+
+    public async Task<List<Ticket>> GetTicketByDateRangeAsync(DateTime startDate, DateTime endDate)
+    {
+        EnsureContext();
+        return await _connection.GetTicketByDateRangeAsync(startDate, endDate);
     }
 
 
@@ -218,23 +231,4 @@ public class ManageTickets : BackgroundService, IManageTickets
         }
     }
 
-    public Task<Ticket?> GetTicketByIdAsync(int ticketId, bool includeAttachments = true)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<List<Ticket>> GetTicketsAsync(bool includeAttachments = true)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<List<Ticket>> GetFilteredTicketsAsync(Func<Ticket, bool> predicate)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<List<Ticket>> GetTicketByDateRange(DateOnly startDate, DateOnly endDate)
-    {
-        throw new NotImplementedException();
-    }
 }
